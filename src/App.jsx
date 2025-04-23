@@ -59,6 +59,11 @@ export default function FlashcardApp() {
     setShowDefinition(false);
   };
 
+  const handlePrevious = () => {
+    setIndex((prev) => (prev - 1 + displayedList.length) % displayedList.length);
+    setShowDefinition(false);
+  };
+
   const handleShuffle = () => {
     setVocabulary(shuffleArray(originalVocabulary));
     setIndex(0);
@@ -79,45 +84,65 @@ export default function FlashcardApp() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-100">
-      <motion.div
-        className="relative w-full max-w-sm sm:max-w-md md:max-w-lg h-64 sm:h-72 md:h-80 bg-white shadow-2xl rounded-2xl p-6 text-center cursor-pointer flex flex-col justify-center items-center"
-        onClick={handleCardClick}
-        initial={false}
-        animate={{ rotateY: showDefinition ? 180 : 0 }}
-        transition={{ duration: 0.6 }}
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        <div className="absolute top-4 right-4" onClick={toggleStar}>
+      <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg h-64 sm:h-72 md:h-80">
+        <div className="absolute top-4 right-4 z-20" onClick={toggleStar}>
           {starred.has(current.word) ? <Star className="text-yellow-400" /> : <StarOff className="text-gray-400" />}
         </div>
-        <div className="text-xl" style={{ backfaceVisibility: "hidden", transform: showDefinition ? "rotateY(180deg)" : "none" }}>
-          <strong>{showDefinition ? current.definition : current.word}</strong>
-        </div>
-      </motion.div>
-      <div className="w-full max-w-sm sm:max-w-md md:max-w-lg flex justify-between items-center mt-4">
-        <div className="flex items-center gap-2">
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600"
-            onClick={handleShuffle}
-          >
-            Shuffle
-          </button>
-          <label className="flex items-center gap-1 text-sm">
-            <input
-              type="checkbox"
-              checked={onlyStarred}
-              onChange={(e) => setOnlyStarred(e.target.checked)}
-            />
-            Starred only
-          </label>
-        </div>
-        <span className="text-gray-600">{displayedList.length > 0 ? `${(index % displayedList.length) + 1} of ${displayedList.length}` : "0 of 0"}</span>
-        <button
-          className="px-4 py-2 bg-green-500 text-white rounded-xl shadow hover:bg-green-600"
-          onClick={handleNext}
+        <motion.div
+          className="w-full h-full bg-white shadow-2xl rounded-2xl p-6 text-center cursor-pointer flex flex-col justify-center items-center"
+          onClick={handleCardClick}
+          initial={false}
+          animate={{ rotateY: showDefinition ? 180 : 0 }}
+          transition={{ duration: 0.6 }}
+          style={{ transformStyle: "preserve-3d" }}
         >
-          Next
-        </button>
+          <div className="text-xl text-center w-full px-4" style={{ backfaceVisibility: "hidden", transform: showDefinition ? "rotateY(180deg)" : "none" }}>
+            <strong>{current.word}</strong>
+            {showDefinition && <p className="mt-2 text-gray-700">{current.definition}</p>}
+          </div>
+        </motion.div>
+      </div>
+      <div className="w-full max-w-sm sm:max-w-md md:max-w-lg mt-4">
+        <div className="h-2 bg-gray-300 rounded-full mb-2">
+          <div
+            className="h-full bg-green-500 rounded-full"
+            style={{ width: `${((index % displayedList.length) + 1) / displayedList.length * 100}%` }}
+          ></div>
+        </div>
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <button
+              className="px-4 py-2 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600"
+              onClick={handleShuffle}
+            >
+              Shuffle
+            </button>
+            <label className="flex items-center gap-2 text-sm">
+              <span>Starred</span>
+              <input
+                type="checkbox"
+                checked={onlyStarred}
+                onChange={(e) => setOnlyStarred(e.target.checked)}
+                className="w-6 h-6 accent-green-500"
+              />
+            </label>
+          </div>
+          <span className="text-gray-600">{displayedList.length > 0 ? `${(index % displayedList.length) + 1} of ${displayedList.length}` : "0 of 0"}</span>
+          <div className="flex gap-2">
+            <button
+              className="px-4 py-2 bg-gray-400 text-white rounded-xl shadow hover:bg-gray-500"
+              onClick={handlePrevious}
+            >
+              &lt;
+            </button>
+            <button
+              className="px-4 py-2 bg-green-500 text-white rounded-xl shadow hover:bg-green-600"
+              onClick={handleNext}
+            >
+              &gt;
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
